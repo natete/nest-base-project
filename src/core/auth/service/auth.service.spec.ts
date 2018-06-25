@@ -12,6 +12,7 @@ import { v4 } from 'uuid';
 import { AccessToken } from '../model/access-token';
 import { promisify } from 'util';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { ExpiredTokenException } from '../exceptions/expired-token.exception';
 
 describe('AuthService', () => {
   let provider: AuthService;
@@ -36,7 +37,7 @@ describe('AuthService', () => {
         {
           provide: AuthConstants.USER_REPOSITORY,
           useValue: {
-            findOne: (options?: any) => null
+            findOne: () => null
           }
         },
         {
@@ -100,7 +101,7 @@ describe('AuthService', () => {
 
       await expect(provider.refresh(expiredRefreshToken))
         .rejects
-        .toMatchObject(Object.assign({}, new BadRequestException('Expired token')));
+        .toMatchObject(Object.assign({}, new ExpiredTokenException('Expired token')));
     });
 
     it('should fail on revoked token', async () => {

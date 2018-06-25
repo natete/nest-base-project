@@ -27,7 +27,10 @@ describe('JwtStrategyService', () => {
         JwtStrategyService,
         {
           provide: 'AuthService',
-          useValue: { isValidUser: (payload) => null }
+          useValue: {
+            isExpiredToken: () => null,
+            isValidUser: () => null
+          }
         }
       ]
     }).compile();
@@ -67,6 +70,7 @@ describe('JwtStrategyService', () => {
   });
 
   it('should fail on revoked token', async () => {
+    jest.spyOn(authService, 'isExpiredToken').mockReturnValue(false);
     jest.spyOn(authService, 'isValidUser').mockReturnValue(false);
 
     const incomingMessage = new CustomIncomingMessage(null);
@@ -74,11 +78,12 @@ describe('JwtStrategyService', () => {
 
     await strategyService.validate(incomingMessage, jwtPayload, done);
 
-    expect(done.mock.calls[0][0]).toMatchObject(Object.assign({}, new UnauthorizedException()));
+    expect(done.mock.calls[0][0]).toMatchObject(Object.assign({}, new UnauthorizedException('Revoked token')));
     expect(done.mock.calls[0][1]).toBeFalsy();
   });
 
   it('should return the token from the user on valid token', async () => {
+    jest.spyOn(authService, 'isExpiredToken').mockReturnValue(false);
     jest.spyOn(authService, 'isValidUser').mockReturnValue(true);
 
     const incomingMessage = new CustomIncomingMessage(null);

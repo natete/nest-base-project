@@ -11,6 +11,7 @@ import { JwtPayload } from '../interfaces/jwt-payload';
 import { RedisClient } from 'redis';
 import { promisify } from 'util';
 import { v4 } from 'uuid';
+import { ExpiredTokenException } from '../exceptions/expired-token.exception';
 
 export interface Authentication {
   accessToken: string;
@@ -93,8 +94,8 @@ export class AuthService {
       throw new BadRequestException('Invalid token');
     }
 
-    if (!this.isExpiredToken(payload)) {
-      throw new BadRequestException('Expired token');
+    if (this.isExpiredToken(payload)) {
+      throw new ExpiredTokenException('Expired token');
     }
 
     if (!await this.isValidUser(payload)) {
