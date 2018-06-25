@@ -1,5 +1,8 @@
-export class UserToken {
-  readonly username: string;
-  readonly type = 'ACCESS_TOKEN';
-  readonly roles: string[];
+import { Token } from './token';
+
+export class AccessToken extends Token {
+
+  constructor(username: string, roles: string[]) {
+    super(username, roles);
+  }
 }

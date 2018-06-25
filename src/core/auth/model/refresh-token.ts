@@ -1,11 +1,9 @@
-export class AccessToken {
-  readonly username: string;
-  readonly type = 'ACCESS_TOKEN';
-  readonly roles: string[];
+import { Token } from './token';
+import { AuthConstants } from '../auth.constants';
 
+export class RefreshToken extends Token {
 
-  constructor(username: string, roles: string[]) {
-    this.username = username;
-    this.roles = roles;
+  constructor(username: string) {
+    super(username, [AuthConstants.REFRESH_AUTHORITY]);
   }
 }
