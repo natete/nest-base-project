@@ -23,7 +23,7 @@ export class JwtStrategyService extends PassportStrategy(Strategy) {
     const isExpiredToken = this.authService.isExpiredToken(payload);
 
     if (isExpiredToken) {
-      return done(new ExpiredTokenException('Expired token'), false);
+      return done(new ExpiredTokenException(), false);
     }
 
     const isValidUser = await this.authService.isValidUser(payload);

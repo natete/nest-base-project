@@ -13,6 +13,7 @@ import { AccessToken } from '../model/access-token';
 import { promisify } from 'util';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ExpiredTokenException } from '../exceptions/expired-token.exception';
+import { Repository } from 'typeorm';
 
 describe('AuthService', () => {
   let provider: AuthService;
@@ -35,7 +36,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: AuthConstants.USER_REPOSITORY,
+          provide: 'UserRepository',
           useValue: {
             findOne: () => null
           }
@@ -49,7 +50,7 @@ describe('AuthService', () => {
 
     // Init providers
     provider = module.get<AuthService>(AuthService);
-    repository = module.get<any>(AuthConstants.USER_REPOSITORY);
+    repository = module.get<Repository<User>>('UserRepository');
     redis = module.get<any>('redis');
 
     initHelperVariables();
@@ -77,6 +78,14 @@ describe('AuthService', () => {
         .rejects
         .toMatchObject(Object.assign({}, new UnauthorizedException('Invalid credentials')));
     });
+
+    it('should fail with user not in database', async () => {
+      jest.spyOn(repository, 'findOne').mockReturnValue(null);
+
+      await expect(provider.login('jsmith', '1234'))
+        .rejects
+        .toMatchObject(Object.assign({}, new UnauthorizedException('Invalid credentials')));
+    });
   });
 
   describe('refresh token', () => {
@@ -101,7 +110,7 @@ describe('AuthService', () => {
 
       await expect(provider.refresh(expiredRefreshToken))
         .rejects
-        .toMatchObject(Object.assign({}, new ExpiredTokenException('Expired token')));
+        .toMatchObject(Object.assign({}, new ExpiredTokenException()));
     });
 
     it('should fail on revoked token', async () => {

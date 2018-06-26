@@ -12,6 +12,7 @@ import { RedisClient } from 'redis';
 import { promisify } from 'util';
 import { v4 } from 'uuid';
 import { ExpiredTokenException } from '../exceptions/expired-token.exception';
+import { InjectRepository } from '@nestjs/typeorm';
 
 export interface Authentication {
   accessToken: string;
@@ -28,14 +29,14 @@ export class AuthService {
   private readonly audience = process.env[AuthConstants.AUDIENCE].split(',');
   private readonly EXPIRATION_MODE = 'EX';
 
-  constructor(@Inject(AuthConstants.USER_REPOSITORY) private readonly repository: Repository<User>,
+  constructor(@InjectRepository(User) private readonly repository: Repository<User>,
               @Inject('redis') private readonly redis: any) {}
 
   async login(username: string, password: string): Promise<Authentication> {
 
     const user: User = await this.repository.findOne({ username });
 
-    if (bcrypt.compareSync(password, user.password)) {
+    if (user && bcrypt.compareSync(password, user.password)) {
 
       const accessToken = this.getAccessToken(user);
 
@@ -95,7 +96,7 @@ export class AuthService {
     }
 
     if (this.isExpiredToken(payload)) {
-      throw new ExpiredTokenException('Expired token');
+      throw new ExpiredTokenException();
     }
 
     if (!await this.isValidUser(payload)) {

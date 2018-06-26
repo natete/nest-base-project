@@ -2,15 +2,14 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { JwtStrategyService } from './service/jwt-strategy.service';
 import { AuthController } from './controller/auth.controller';
-import { DatabaseModule } from '../database/database.module';
-import { userReposiotryProvider } from './model/user.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './model/user.entity';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [TypeOrmModule.forFeature([User])],
   providers: [
     AuthService,
     JwtStrategyService,
-    ...userReposiotryProvider,
     {
       provide: 'redis',
       useFactory: () => require('redis')

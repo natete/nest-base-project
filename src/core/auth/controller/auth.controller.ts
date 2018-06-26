@@ -32,6 +32,6 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(AuthConstants.REFRESH_AUTHORITY)
   async refresh(@Headers('authorization') authorization) {
-    return this.authService.refresh(authorization);
+    return this.authService.refresh(authorization.replace('bearer ', ''));
   }
 }
