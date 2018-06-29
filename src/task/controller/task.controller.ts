@@ -3,8 +3,10 @@ import { Task } from '../model/task.entity';
 import { TaskService } from '../services/task.service';
 import { AuthGuard } from '@nestjs/passport';
 import { BaseController } from '../../core/base/controller/base.controller';
+import { ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
 
 @Controller('task')
+@ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 export class TaskController extends BaseController<Task> {
 
@@ -13,6 +15,7 @@ export class TaskController extends BaseController<Task> {
   }
 
   @Post()
+  @ApiImplicitBody({ name: 'Task', type: Task })
   create(@Body() task: Task): Promise<Task> {
     return super.create(task);
   }

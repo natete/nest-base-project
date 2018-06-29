@@ -21,6 +21,7 @@
     "@nestjs/common": "^5.0.0",
     "@nestjs/core": "^5.0.0",
     "@nestjs/passport": "^1.1.0",
+    "@nestjs/swagger": "^2.2.0",
     "@nestjs/typeorm": "^5.0.1",
     "bcrypt": "^2.0.1",
     "class-transformer": "^0.1.9",

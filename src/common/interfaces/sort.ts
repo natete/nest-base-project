@@ -1,6 +1,6 @@
 import { SortDirection } from './sort-direction';
 
-export interface Sort {
+export class Sort {
   direction: SortDirection;
   field: string;
 }

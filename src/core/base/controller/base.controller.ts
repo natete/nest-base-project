@@ -3,6 +3,7 @@ import { BaseService } from '../service/base.service';
 import { BaseEntity } from '../entity/base.entity';
 import { Sort } from '../../../common/interfaces/sort';
 import { ParseIntWithOptionsPipe } from '../../../common/validators/parse-int-with-options.pipe';
+import { ApiImplicitQuery } from '@nestjs/swagger';
 
 export class BaseController<T extends BaseEntity> {
 
@@ -15,8 +16,13 @@ export class BaseController<T extends BaseEntity> {
   constructor(private readonly service: BaseService<T>) {}
 
   @Get()
+  @ApiImplicitQuery({ name: BaseController.PARAM_PAGE, required: false, type: Number })
+  @ApiImplicitQuery({ name: BaseController.PARAM_SIZE, required: false, type: Number })
+  @ApiImplicitQuery({ name: BaseController.PARAM_SORT, required: false, type: Sort })
+  @ApiImplicitQuery({ name: BaseController.PARAM_SEARCH_TERM, required: false, type: String })
+  @ApiImplicitQuery({ name: BaseController.PARAM_SEARCH_CRITERIA, required: false, type: String })
   findAll(
-    @Query(BaseController.PARAM_PAGE, ParseIntWithOptionsPipe) page: number,
+    @Query(BaseController.PARAM_PAGE, ParseIntWithOptionsPipe) page?: number,
     @Query(BaseController.PARAM_SIZE, ParseIntWithOptionsPipe) size?: number,
     @Query(BaseController.PARAM_SORT) sort?: Sort[],
     @Query(BaseController.PARAM_SEARCH_TERM) searchTerm?: string,
