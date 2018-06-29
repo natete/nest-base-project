@@ -74,10 +74,7 @@ export class BaseService<T extends BaseEntity> {
     return this.repository.remove(storedEntity);
   }
 
-  /**
-   * To be override.
-   * @param {T extends BaseEntity} entity
-   */
+  // To be override.
   validateEntity(entity: T) {
     throw new NotImplementedException();
   }
