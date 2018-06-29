@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BaseService } from './base.service';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Sort } from '../../../common/interfaces/sort';
 import { SortDirection } from '../../../common/interfaces/sort-direction';
 
@@ -60,8 +60,17 @@ describe('BaseService', () => {
 
     });
 
-    it('should pass the query options when provided', () => {
+    it('should pass the query options when provided', async () => {
+      const searchTerm = 'term';
+      const searchCriteria = 'criteria';
 
+      await service.findAll({ searchCriteria, searchTerm });
+
+      expect(repository.find).toHaveBeenCalledWith({
+        where: {
+          criteria: Like(`%${searchTerm.toLowerCase()}%`)
+        }
+      });
     });
   });
 });

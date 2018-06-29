@@ -10,4 +10,8 @@ export class TaskService extends BaseService<Task> {
   constructor(@InjectRepository(Task) private readonly taskRepository: Repository<Task>) {
     super(taskRepository);
   }
+
+  validateEntity(entity: Task): void {
+    // Everything is covered by class-validator
+  }
 }

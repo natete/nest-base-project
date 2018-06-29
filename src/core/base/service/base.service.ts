@@ -1,6 +1,7 @@
 import { FindManyOptions, Like, Repository } from 'typeorm';
 import { BaseEntity } from '../entity/base.entity';
 import { FindOptions } from '../interfaces/find-options';
+import { BadRequestException, NotFoundException, NotImplementedException } from '@nestjs/common';
 
 export class BaseService<T extends BaseEntity> {
 
@@ -36,7 +37,48 @@ export class BaseService<T extends BaseEntity> {
   }
 
   save(entity: T): Promise<T> {
-    /* tslint:disable */
+    this.validateEntity(entity);
+
     return this.repository.save(entity);
+  }
+
+  async update(id: number, entity: T): Promise<T> {
+    if (id) {
+      this.validateEntity(entity);
+
+      const storedEntity = await this.repository.findOne(id);
+
+      if (!storedEntity) {
+        throw new BadRequestException('Entity not found');
+      }
+
+      const partial = Object.keys(storedEntity)
+        .filter(key => key !== 'id' && storedEntity[key] !== entity[key])
+        .reduce((acc, key) => Object.assign(acc, { [key]: entity[key] }), {});
+
+      await this.repository.update(id, partial);
+
+      return Object.assign({}, storedEntity, entity, { id });
+    } else {
+      throw new NotFoundException();
+    }
+  }
+
+  async deleteEntity(id: number): Promise<T> {
+    const storedEntity = await this.repository.findOne(id);
+
+    if (!storedEntity) {
+      throw new NotFoundException();
+    }
+
+    return this.repository.remove(storedEntity);
+  }
+
+  /**
+   * To be override.
+   * @param {T extends BaseEntity} entity
+   */
+  validateEntity(entity: T) {
+    throw new NotImplementedException();
   }
 }
